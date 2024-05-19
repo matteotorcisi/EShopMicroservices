@@ -18,7 +18,9 @@ public class DiscountService
         {
             coupon = new Coupon { ProductName = "No Discount", Amount = 0, Description = "No Discount Desc" };
         }
-
+        
+        logger.LogInformation("Discount is retrieved for ProductName : {productName}, Amount : {amount}", coupon.ProductName, coupon.Amount);
+        
         var couponModel = coupon.Adapt<CouponModel>();
         return couponModel;
     }
@@ -67,3 +69,4 @@ public class DiscountService
         return new DeleteDiscountResponse { Success = true };
     }
 }
+ 

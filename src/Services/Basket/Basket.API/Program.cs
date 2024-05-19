@@ -1,10 +1,10 @@
+using Discount.grpc;
 using HealthChecks.UI.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Services
 var assembly = typeof(Program).Assembly;
-
 //MediatR
 builder.Services.AddMediatR(config =>
 {
@@ -12,13 +12,11 @@ builder.Services.AddMediatR(config =>
     config.AddOpenBehavior(typeof(ValidationBehavior<,>));
     config.AddOpenBehavior(typeof(LoggingBehavior<,>));
 });
-
 builder.Services.AddValidatorsFromAssembly(assembly);
-
 //carter
 builder.Services.AddCarter();
-
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
+
 
 //marten
 builder.Services.AddMarten(opt =>
@@ -45,9 +43,31 @@ builder.Services.AddStackExchangeRedisCache(opts =>
     opts.Configuration = builder.Configuration.GetConnectionString("Redis");
 });
 
+
+// grpc services
+builder.Services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(options =>
+{
+    options.Address = new Uri(builder.Configuration["GrpcSettings:DiscountUrl"]!);
+})
+.ConfigurePrimaryHttpMessageHandler(() =>
+{
+    var handler = new HttpClientHandler
+    {
+        ServerCertificateCustomValidationCallback = 
+        HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+    };
+
+    return handler;
+});
+
+
+//cross-cutting services
 builder.Services.AddHealthChecks()
     .AddNpgSql(builder.Configuration.GetConnectionString("Database")!)
     .AddRedis(builder.Configuration.GetConnectionString("Redis")!);
+
+
+
 
 var app = builder.Build();
 
