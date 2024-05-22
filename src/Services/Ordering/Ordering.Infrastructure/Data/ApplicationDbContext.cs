@@ -1,15 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
-using Ordering.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Ordering.Domain.Models;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+
+/*
+ * MIGRATIONS:
+ * Add-Migration InitialCreate -OutputDir Data/Migrations -Project Ordering.Infrastructure -StartupProject Ordering.API
+ */
 
 namespace Ordering.Infrastructure.Data;
-
 public class ApplicationDbContext: DbContext
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
